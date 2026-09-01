@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:mysql://mysql:3306/order_db
+    username: root
+    password:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  server:
+    port: 8085
+
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://mysql:8761/eureka
+
+  springdoc:
+    api-docs:
+      enabled: true
+    swagger-ui:
+      enabled: true
+      path: /swagger-ui.html
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health
+    endpoint:
+      health:
+        show-details: always
+
+  logging:
+    file:
+      name: logs/order-service.log
+    level:
+      root: INFO
+      com.library.orderservice: DEBUG

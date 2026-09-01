@@ -1,0 +1,90 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: auth-public
+              uri: http://auth-service:8080
+              predicates:
+                - Path=/auth/login,/auth/register
+
+            - id: auth-protected
+              uri: http://auth-service:8080
+              predicates:
+                - Path=/auth/users/**
+              filters:
+                - jwtFilter
+
+            - id: book-service
+              uri: http://book-service:8080
+              predicates:
+                - Path=/books/**
+              filters:
+                - jwtFilter
+
+            - id: cart-service
+              uri: http://cart-service:8080
+              predicates:
+                - Path=/cart/**
+              filters:
+                - jwtFilter
+
+            - id: order-service
+              uri: http://order-service:8080
+              predicates:
+                - Path=/orders/**
+              filters:
+                - jwtFilter
+
+            - id: inventory-service
+              uri: http://inventory-service:8080
+              predicates:
+                - Path=/inventory/**
+              filters:
+                - jwtFilter
+
+            - id: review-service
+              uri: http://review-service:8080
+              predicates:
+                - Path=/reviews/**
+              filters:
+                - jwtFilter
+
+            - id: payment-service
+              uri: http://payment-service:8080
+              predicates:
+                - Path=/payments/**
+              filters:
+                - jwtFilter
+
+            - id: user-service
+              uri: http://user-service:8080
+              predicates:
+                - Path=/users/**
+              filters:
+                - jwtFilter
+
+            - id: notification-service
+              uri: http://notification-service:8080
+              predicates:
+                - Path=/notifications/**
+              filters:
+                - jwtFilter
+
+            - id: recommendation-service
+              uri: http://recommendation-service:8080
+              predicates:
+                - Path=/recommendations/**
+              filters:
+                - jwtFilter
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: bXlzZWNyZXRrZXlteXNlY3JldGtleW15c2VjcmV0a2V5MTIzNDU2
