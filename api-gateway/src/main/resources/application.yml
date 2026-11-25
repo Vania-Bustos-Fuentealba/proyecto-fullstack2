@@ -82,6 +82,13 @@ spring:
               filters:
                 - jwtFilter
 
+            - id: content-service
+              uri: http://content-service:8080
+              predicates:
+                - Path=/v1/posts/**,/v1/contact/**
+              filters:
+                - jwtFilter
+
 server:
   port: 8080
 

@@ -252,6 +252,24 @@ services:
     networks:
       - library-network
 
+  content-service:
+    build: ./content-service
+    container_name: content-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/content_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SERVER_PORT: 8080
+      JAVA_TOOL_OPTIONS: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/"
+    ports:
+      - "8084:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    networks:
+      - library-network
 
 volumes:
   mysql-data:
