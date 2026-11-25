@@ -25,8 +25,19 @@ public class JwtWebMvcFilter implements HandlerFilterFunction<ServerResponse, Se
     public ServerResponse filter(ServerRequest request, HandlerFunction<ServerResponse> next) throws Exception {
 
         String path = request.path();
+        HttpMethod method = request.method();
+
+        // Preflight CORS: el navegador lo envía sin token
+        if (method == HttpMethod.OPTIONS) {
+            return next.handle(request);
+        }
 
         if (path.startsWith("/auth/login") || path.startsWith("/auth/register")) {
+            return next.handle(request);
+        }
+
+        // Contenido público: leer el blog y enviar el formulario de contacto
+        if (isPublicContent(path, method)) {
             return next.handle(request);
         }
 
@@ -50,15 +61,21 @@ public class JwtWebMvcFilter implements HandlerFilterFunction<ServerResponse, Se
             String role = claims.get("role", String.class);
 
             if (path.startsWith("/books")
-                    && (request.method() == HttpMethod.POST
-                    || request.method() == HttpMethod.PUT
-                    || request.method() == HttpMethod.DELETE)
+                    && (method == HttpMethod.POST
+                    || method == HttpMethod.PUT
+                    || method == HttpMethod.DELETE)
                     && !"ADMIN".equals(role)) {
                 return ServerResponse.status(HttpStatus.FORBIDDEN).build();
             }
 
             if (path.startsWith("/auth/users")
-                    && request.method() == HttpMethod.DELETE
+                    && method == HttpMethod.DELETE
+                    && !"ADMIN".equals(role)) {
+                return ServerResponse.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            // Todo lo de contenido que no es público (crear/editar/borrar posts, ver mensajes) es solo ADMIN
+            if ((path.startsWith("/v1/posts") || path.startsWith("/v1/contact"))
                     && !"ADMIN".equals(role)) {
                 return ServerResponse.status(HttpStatus.FORBIDDEN).build();
             }
@@ -68,5 +85,12 @@ public class JwtWebMvcFilter implements HandlerFilterFunction<ServerResponse, Se
         } catch (Exception e) {
             return ServerResponse.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    private boolean isPublicContent(String path, HttpMethod method) {
+        boolean readPosts = method == HttpMethod.GET
+                && (path.equals("/v1/posts") || path.startsWith("/v1/posts/"));
+        boolean sendContact = method == HttpMethod.POST && path.equals("/v1/contact");
+        return readPosts || sendContact;
     }
 }
