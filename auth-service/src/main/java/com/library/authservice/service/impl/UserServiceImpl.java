@@ -11,7 +11,7 @@ import com.library.authservice.security.JwtService;
 import com.library.authservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +28,9 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final RestTemplate restTemplate;
+
+    @Value("${user-service.url:http://user-service:8080}")
+    private String userServiceUrl;
 
     @Override
     public UserResponseDTO registerUser(RegisterRequestDTO request) {
@@ -53,7 +56,7 @@ public class UserServiceImpl implements UserService {
         userRequest.put("address", "Direccion temporal");
 
         String responseUserService = restTemplate.postForObject(
-                "http://localhost:8089/users",
+                userServiceUrl + "/users",
                 userRequest,
                 String.class
         );
