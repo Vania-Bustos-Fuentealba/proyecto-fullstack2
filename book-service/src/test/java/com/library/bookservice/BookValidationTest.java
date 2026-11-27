@@ -19,7 +19,7 @@ class BookValidationTest {
             // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
             BookRequestDTO book = new BookRequestDTO();
             // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
-            book.setTitle("Libro válido"); book.setAuthor("Autora válida");
+            book.setCode("TEST-001"); book.setCategory("Narrativa"); book.setTitle("Libro válido"); book.setAuthor("Autora válida");
             // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
             var violations = factory.getValidator().validate(book);
             // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.

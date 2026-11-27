@@ -118,7 +118,7 @@ class JwtWebMvcFilterTest {
     // Nota de lectura: Marca el método siguiente como una prueba ejecutable por JUnit.
     @Test void rechazaTokensAusentesInvalidosVencidosYRolesDesconocidos() throws Exception {
         // Nota de lectura: Recorre los elementos indicados y ejecuta el bloque para cada uno.
-        for (String jwt : new String[]{null, "invalido", token("ADMIN", -1000), token("SELLER", 60000)}) {
+        for (String jwt : new String[]{null, "invalido", token("ADMIN", -1000), token("DESCONOCIDO", 60000)}) {
             // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
             assertEquals(401, filter.filter(request("GET", "/users", jwt),
                     // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
@@ -213,6 +213,27 @@ class JwtWebMvcFilterTest {
         });
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(401, filter.filter(request("POST", "/pedidos", null), req -> ServerResponse.ok().build()).statusCode().value());
+    // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
+    }
+
+    // Nota de lectura: Marca el método siguiente como una prueba ejecutable por JUnit.
+    @Test void vendedorSoloConsultaProductosYOrdenes() throws Exception {
+        // Nota de lectura: Recorre los elementos indicados y ejecuta el bloque para cada uno.
+        for (String path : List.of("/books", "/books/7", "/pedidos", "/pedidos/7", "/auth/session"))
+            // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+            assertEquals(200, filter.filter(request("GET", path, token("SELLER", 60000)), req -> ServerResponse.ok().build()).statusCode().value());
+        // Nota de lectura: Recorre los elementos indicados y ejecuta el bloque para cada uno.
+        for (String path : List.of("/users", "/auth/users", "/v1/contact"))
+            // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+            assertEquals(403, filter.filter(request("GET", path, token("SELLER", 60000)), req -> { fail("No autorizado"); return null; }).statusCode().value());
+        // Nota de lectura: Recorre los elementos indicados y ejecuta el bloque para cada uno.
+        for (String path : List.of("/books", "/pedidos", "/auth/users", "/v1/posts", "/inventory"))
+            // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+            assertEquals(403, filter.filter(request("POST", path, token("SELLER", 60000)), req -> { fail("No autorizado"); return null; }).statusCode().value());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(200, filter.filter(request("POST", "/auth/refresh", token("SELLER", 60000)), req -> ServerResponse.ok().build()).statusCode().value());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(401, filter.filter(request("POST", "/auth/refresh", null), req -> { fail("Sin sesión"); return null; }).statusCode().value());
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
     }
 // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.

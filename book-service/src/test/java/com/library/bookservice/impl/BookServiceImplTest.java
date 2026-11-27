@@ -60,6 +60,8 @@ class BookServiceImplTest {
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         BookRequestDTO dto = new BookRequestDTO();
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        dto.setCode("TEST-001"); dto.setCategory("Narrativa"); dto.setCriticalStock(2);
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         dto.setTitle("Clean Code");
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         dto.setAuthor("Robert Martin");

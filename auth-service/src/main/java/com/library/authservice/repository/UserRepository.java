@@ -17,5 +17,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
     boolean existsByEmail(String email);
+    // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+    boolean existsByRun(String run);
+    // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+    boolean existsByRunAndIdNot(String run, Long id);
 // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
 }

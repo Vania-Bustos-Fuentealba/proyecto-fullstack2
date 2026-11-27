@@ -62,7 +62,7 @@ class BookServiceApplicationTests {
     // Nota de lectura: Marca el método siguiente como una prueba ejecutable por JUnit.
     @Test void crudYCheckoutConStockAtomico() throws Exception {
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
-        String book = "{\"title\":\"Libro HTTP\",\"author\":\"Autora\",\"price\":14990.50,\"stock\":3}";
+        String book = "{\"code\":\"HTTP-001\",\"category\":\"Narrativa\",\"description\":\"Libro para pruebas\",\"imageUrl\":\"/books/Alas_de_sangre.webp\",\"criticalStock\":2,\"title\":\"Libro HTTP\",\"author\":\"Autora\",\"price\":14990.50,\"stock\":3}";
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         var created = call("POST", "/books", book); assertEquals(201, created.statusCode()); long bid=id(created);
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
@@ -75,6 +75,16 @@ class BookServiceApplicationTests {
         assertEquals(200, call("PUT", "/books/"+bid, book).statusCode());
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(400, call("POST", "/books", "{}").statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(409, call("POST", "/books", book).statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(400, call("POST", "/books", book.replace("\"stock\":3", "\"stock\":1.5")).statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(400, call("POST", "/books", book.replace("\"criticalStock\":2", "\"criticalStock\":-1")).statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(400, call("POST", "/books", book.replace("Narrativa", "Categoría inexistente")).statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(400, call("POST", "/books", book.replace("/books/Alas_de_sangre.webp", "javascript:alert(1)")).statusCode());
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(404, call("GET", "/books/999999", null).statusCode());
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
@@ -102,6 +112,8 @@ class BookServiceApplicationTests {
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(200,call("GET","/pedidos",null,headers).statusCode());
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(200,call("GET","/pedidos/"+oid,null,"X-User-Id","99","X-User-Role","SELLER").statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(409,call("POST","/pedidos",order.replace("Ana Perez","Otra persona"),headers).statusCode());
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         headers[5]="http-test-request-0002";
@@ -110,7 +122,7 @@ class BookServiceApplicationTests {
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(1,((Number)com.jayway.jsonpath.JsonPath.read(call("GET","/books/"+bid,null).body(),"$.stock")).intValue());
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
-        var disposable=call("POST","/books",book);
+        var disposable=call("POST","/books",book.replace("HTTP-001", "HTTP-002"));
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(204,call("DELETE","/books/"+id(disposable),null).statusCode());
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.

@@ -82,8 +82,16 @@ public class UserServiceImpl implements UserService {
         // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
         }
 
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        com.library.authservice.security.ProfileRules.validate(request);
+        // Nota de lectura: Consulta o modifica la base de datos a través del repositorio JPA.
+        if (userRepository.existsByRun(request.getRun().toUpperCase(java.util.Locale.ROOT)))
+            // Nota de lectura: Interrumpe la operación y comunica el error al manejador correspondiente.
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT, "El RUN ya está registrado");
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         User user = new User();
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        com.library.authservice.security.ProfileRules.apply(request, user);
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         user.setName(request.getName());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
@@ -97,11 +105,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
 
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
-        java.util.Map<String, Object> userRequest = new java.util.HashMap<>();
-        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
-        userRequest.put("name", request.getName());
-        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
-        userRequest.put("email", request.getEmail());
+        var userRequest = com.library.authservice.security.ProfileRules.payload(request, request.getName(), request.getEmail());
         // Conserva la URL configurable de Ale y el alta reintentable de administración.
         // Nota de lectura: Comunicación HTTP interna con otro servicio; no es una operación de LocalStorage.
         restTemplate.put(userServiceUrl + "/users/email/{email}", userRequest, request.getEmail());

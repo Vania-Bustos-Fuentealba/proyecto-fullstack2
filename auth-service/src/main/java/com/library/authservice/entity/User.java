@@ -60,9 +60,37 @@ public class User {
 
     // Nota de lectura: Define una función o método con los parámetros que necesita esta parte del flujo.
     public User(Long id, String name, String email, String password, Role role) {
-        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
-        this(id, name, email, password, role, 0L);
+        // Nota de lectura: Asigna al objeto la dependencia o el valor recibido por el método.
+        this.id = id; this.name = name; this.email = email;
+        // Nota de lectura: Asigna al objeto la dependencia o el valor recibido por el método.
+        this.password = password; this.role = role;
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
     }
+
+    // Datos exigidos por la ERS. Las cuentas previas se completan al editarlas.
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 9, unique = true)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String run;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 100)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String lastName;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column
+    // Nota de lectura: Completa los argumentos o la expresión iniciada en la línea anterior.
+    private java.time.LocalDate birthDate;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 100)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String region;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 100)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String commune;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 300)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String address;
 // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
 }

@@ -46,6 +46,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/users", "/auth/users/**").hasRole("ADMIN")
                         // Nota de lectura: Exige una identidad autenticada antes de permitir la ruta.
                         .requestMatchers("/auth/session").authenticated()
+                        // Nota de lectura: Exige una identidad autenticada antes de permitir la ruta.
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/auth/refresh").authenticated()
                         // Nota de lectura: Permite acceder a la ruta pública especificada sin autenticar.
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         // Nota de lectura: Deniega rutas que no hayan sido permitidas antes.

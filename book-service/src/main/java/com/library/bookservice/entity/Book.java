@@ -47,5 +47,25 @@ public class Book {
     @Column(nullable = false)
     // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
     private Integer stock;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 100, unique = true)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String code;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 500)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String description;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 100)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String category;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column(length = 2000)
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String imageUrl;
+    // Nota de lectura: Configura la columna que almacenará este campo en la base de datos.
+    @Column
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private Integer criticalStock;
 // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
 }

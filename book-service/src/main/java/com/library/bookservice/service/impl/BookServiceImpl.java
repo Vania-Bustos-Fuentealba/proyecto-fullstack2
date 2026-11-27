@@ -54,6 +54,17 @@ public class BookServiceImpl implements BookService {
         response.setPrice(book.getPrice());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         response.setStock(book.getStock());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setCode(book.getCode());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setDescription(book.getDescription());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setCategory(book.getCategory());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setImageUrl(book.getImageUrl());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setCriticalStock(book.getCriticalStock());
+
         // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
         return response;
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
@@ -76,6 +87,17 @@ public class BookServiceImpl implements BookService {
         book.setPrice(request.getPrice());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         book.setStock(request.getStock());
+        // Nota de lectura: Normaliza texto para comparar y guardar datos sin espacios externos o diferencias de mayúsculas.
+        book.setCode(request.getCode().trim());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        book.setDescription(request.getDescription());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        book.setCategory(request.getCategory());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        book.setImageUrl(request.getImageUrl());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        book.setCriticalStock(request.getCriticalStock());
+
 
         // Nota de lectura: Consulta o modifica los registros mediante el repositorio de persistencia.
         Book savedBook = bookRepository.save(book);
@@ -138,6 +160,17 @@ public class BookServiceImpl implements BookService {
         book.setPrice(request.getPrice());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         book.setStock(request.getStock());
+        // Nota de lectura: Normaliza texto para comparar y guardar datos sin espacios externos o diferencias de mayúsculas.
+        book.setCode(request.getCode().trim());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        book.setDescription(request.getDescription());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        book.setCategory(request.getCategory());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        book.setImageUrl(request.getImageUrl());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        book.setCriticalStock(request.getCriticalStock());
+
 
         // Nota de lectura: Registra información de diagnóstico para seguir la operación en el servidor.
         logger.info("Actualizando libro con ID: {}", id);

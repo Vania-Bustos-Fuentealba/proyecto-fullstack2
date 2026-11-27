@@ -1,4 +1,7 @@
 spring:
+  jackson:
+    deserialization:
+      accept-float-as-int: false
   application:
     name: book-service
   datasource:

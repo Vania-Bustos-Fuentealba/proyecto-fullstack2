@@ -121,13 +121,14 @@ public class JwtWebMvcFilter implements HandlerFilterFunction<ServerResponse, Se
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         Object role = claims.get("role");
         // Auth entrega el ID inmutable de la cuenta que debe quedar como dueña del pedido.
+        // Nota de lectura: Completa los argumentos o la expresión iniciada en la línea anterior.
         Long accountId;
         // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
         if (claims.getSubject() == null || claims.getSubject().isBlank()
                 // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
                 || claims.getExpiration() == null
                 // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
-                || !("ADMIN".equals(role) || "CLIENT".equals(role))) {
+                || !("ADMIN".equals(role) || "CLIENT".equals(role) || "SELLER".equals(role))) {
             // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
             return ServerResponse.status(HttpStatus.UNAUTHORIZED).build();
         // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
@@ -143,7 +144,7 @@ public class JwtWebMvcFilter implements HandlerFilterFunction<ServerResponse, Se
             // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
             if (identity == null || identity.id() == null || !claims.getSubject().equals(identity.email())
                     // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
-                    || !("ADMIN".equals(identity.role()) || "CLIENT".equals(identity.role()))) {
+                    || !("ADMIN".equals(identity.role()) || "CLIENT".equals(identity.role()) || "SELLER".equals(identity.role()))) {
                 // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
                 return ServerResponse.status(HttpStatus.UNAUTHORIZED).build();
             // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
@@ -163,15 +164,28 @@ public class JwtWebMvcFilter implements HandlerFilterFunction<ServerResponse, Se
             return ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
         }
+        // El vendedor solo consulta órdenes y mantiene su propia sesión; no realiza mutaciones.
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if ("SELLER".equals(role) && !(lectura && pertenece(path, "/pedidos"))
+                // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+                && !(lectura && path.equals("/auth/session"))
+                // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+                && !(method == HttpMethod.POST && path.equals("/auth/refresh")))
+            // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
+            return ServerResponse.status(HttpStatus.FORBIDDEN).build();
         // Los perfiles contienen datos personales: también su lectura exige administrador.
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         boolean requiereAdmin = pertenece(path, "/users") || pertenece(path, "/auth/users")
                 // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
                 || pertenece(path, "/v1/contact") || pertenece(path, "/v1/posts")
                 // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
-                || (lectura && path.equals("/pedidos"))
-                // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
                 || (!lectura && (pertenece(path, "/books") || pertenece(path, "/inventory")));
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if (lectura && pertenece(path, "/pedidos") && path.equals("/pedidos")
+                // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+                && !("ADMIN".equals(role) || "SELLER".equals(role)))
+            // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
+            return ServerResponse.status(HttpStatus.FORBIDDEN).build();
         // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
         if (requiereAdmin && !"ADMIN".equals(role)) {
             // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.

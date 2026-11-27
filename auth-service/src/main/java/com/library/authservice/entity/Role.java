@@ -6,6 +6,8 @@ public enum Role {
 
      // Nota de lectura: Aporta el valor ADMIN a la declaración o llamada abierta.
      ADMIN,
+     // Nota de lectura: Aporta el valor SELLER a la declaración o llamada abierta.
+     SELLER,
      // Nota de lectura: Aporta el valor CLIENT a la declaración o llamada abierta.
      CLIENT
 // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.

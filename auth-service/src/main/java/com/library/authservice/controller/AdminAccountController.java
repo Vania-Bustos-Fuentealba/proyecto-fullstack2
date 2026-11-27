@@ -46,7 +46,7 @@ public class AdminAccountController {
     public AdminAccountResponse get(@PathVariable Long id) { return accounts.get(id); }
 
     // Nota de lectura: Asocia el método HTTP y la ruta escritos con la operación del controlador.
-    @PostMapping @Operation(summary = "Crear cuenta y perfil con rol ADMIN o CLIENT")
+    @PostMapping @Operation(summary = "Crear cuenta y perfil con rol ADMIN, CLIENT o SELLER")
     // Nota de lectura: Define una función o método con los parámetros que necesita esta parte del flujo.
     public ResponseEntity<AdminAccountResponse> create(@Valid @RequestBody AdminAccountRequest request) {
         // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.

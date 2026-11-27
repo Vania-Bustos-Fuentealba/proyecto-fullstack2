@@ -54,7 +54,7 @@ class AdminAccountServiceTest {
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         account = new User(7L, "Persona", "persona@example.com", "hash", Role.CLIENT);
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
-        request = new AdminAccountRequest();
+        request = com.library.authservice.ProfileTestData.complete(new AdminAccountRequest());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         request.setName("Nombre editado"); request.setEmail("nuevo@example.com"); request.setRole(Role.ADMIN);
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.

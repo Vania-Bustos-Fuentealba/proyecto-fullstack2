@@ -204,7 +204,7 @@ public class PedidoService {
                         // Nota de lectura: Completa los argumentos o la expresión iniciada en la línea anterior.
                         "No existe un pedido con id " + id));
         // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
-        if (!"ADMIN".equals(rol) && !pedido.getPropietario().equals(propietario))
+        if (!"ADMIN".equals(rol) && !"SELLER".equals(rol) && !pedido.getPropietario().equals(propietario))
             // Nota de lectura: Interrumpe la operación y comunica el error al manejador correspondiente.
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Este pedido pertenece a otra cuenta");
         // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.

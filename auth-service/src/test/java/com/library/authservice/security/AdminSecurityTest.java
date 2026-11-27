@@ -154,6 +154,7 @@ class AdminSecurityTest {
     // Nota de lectura: Marca el método siguiente como una prueba ejecutable por JUnit.
     @Test void tokenNoSeTransfiereAOtraCuentaConElMismoCorreo() throws Exception {
         // El repositorio devuelve ahora otra identidad con el mismo correo.
+        // Nota de lectura: Consulta o modifica los registros mediante el repositorio de persistencia.
         when(users.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         String token = jwt.generateToken(user);
@@ -166,6 +167,7 @@ class AdminSecurityTest {
     // Nota de lectura: Marca el método siguiente como una prueba ejecutable por JUnit.
     @Test void cambiarCredencialesInvalidaElTokenAnterior() throws Exception {
         // La consulta posterior al cambio debe devolver la versión actualizada de la cuenta.
+        // Nota de lectura: Consulta o modifica los registros mediante el repositorio de persistencia.
         when(users.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         String token = jwt.generateToken(user);
@@ -175,6 +177,66 @@ class AdminSecurityTest {
         mvc.perform(get("/auth/users").header("Authorization", "Bearer " + token)).andExpect(status().isUnauthorized());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         mvc.perform(get("/auth/users").header("Authorization", "Bearer " + jwt.generateToken(user))).andExpect(status().isOk());
+    // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
+    }
+
+    // Nota de lectura: Marca el método siguiente como una prueba ejecutable por JUnit.
+    @Test void renuevaConElRolActualSinExtenderLaSesionAbsoluta() throws Exception {
+        // Nota de lectura: Consulta o modifica los registros mediante el repositorio de persistencia.
+        when(users.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        ReflectionTestUtils.setField(jwt, "jwtExpiration", 30000L);
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        String original = jwt.generateToken(user);
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        user.setRole(Role.CLIENT);
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        ReflectionTestUtils.setField(jwt, "jwtExpiration", 60000L);
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        String json = mvc.perform(post("/auth/refresh").header("Authorization", "Bearer " + original))
+                // Nota de lectura: Encadena la operación andExpect al resultado anterior.
+                .andExpect(status().isOk()).andExpect(jsonPath("$.role").value("CLIENT"))
+                // Nota de lectura: Encadena la operación andReturn al resultado anterior.
+                .andReturn().getResponse().getContentAsString();
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        var mapper = new tools.jackson.databind.ObjectMapper();
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        String renewed = mapper.readTree(json).get("token").asText();
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        var oldClaims = mapper.readTree(new String(Base64.getUrlDecoder().decode(original.split("\\.")[1]), java.nio.charset.StandardCharsets.UTF_8));
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        var newClaims = mapper.readTree(new String(Base64.getUrlDecoder().decode(renewed.split("\\.")[1]), java.nio.charset.StandardCharsets.UTF_8));
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        Assertions.assertNotEquals(original, renewed);
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        Assertions.assertTrue(newClaims.get("exp").asLong() > oldClaims.get("exp").asLong());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        Assertions.assertEquals(oldClaims.get("sessionExpiresAt"), newClaims.get("sessionExpiresAt"));
+    // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
+    }
+
+    // Nota de lectura: Marca el método siguiente como una prueba ejecutable por JUnit.
+    @Test void renovacionRechazaVencidosAlteradosYVersionAntigua() throws Exception {
+        // Nota de lectura: Consulta o modifica los registros mediante el repositorio de persistencia.
+        when(users.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        mvc.perform(post("/auth/refresh")).andExpect(status().isUnauthorized());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        mvc.perform(post("/auth/refresh").header("Authorization", "Bearer falso")).andExpect(status().isUnauthorized());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        ReflectionTestUtils.setField(jwt, "jwtExpiration", -1000L);
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        mvc.perform(post("/auth/refresh").header("Authorization", "Bearer " + jwt.generateToken(user))).andExpect(status().isUnauthorized());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        ReflectionTestUtils.setField(jwt, "jwtExpiration", 60000L);
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        String original = jwt.generateToken(user);
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        user.setTokenVersion(1L);
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        mvc.perform(post("/auth/refresh").header("Authorization", "Bearer " + original)).andExpect(status().isUnauthorized());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        Assertions.assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> jwt.renewToken(original, user));
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
     }
 // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.

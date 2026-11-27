@@ -2,8 +2,6 @@
 package com.library.authservice.security;
 
 // Nota de lectura: Importa las dependencias indicadas para utilizarlas en este archivo.
-import com.library.authservice.entity.Role;
-// Nota de lectura: Importa las dependencias indicadas para utilizarlas en este archivo.
 import com.library.authservice.entity.User;
 // Nota de lectura: Importa las dependencias indicadas para utilizarlas en este archivo.
 import io.jsonwebtoken.Claims;
@@ -42,6 +40,12 @@ public class JwtService {
     // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
     private long jwtExpiration;
 
+    // Una sesión no se prolonga indefinidamente aunque se renueve el acceso.
+    // Nota de lectura: Lee una propiedad de configuración o variable de entorno; no escribe un secreto en el código.
+    @Value("${jwt.session-duration:86400000}")
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private long sessionDuration = 86400000L;
+
     // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
     private Key signingKey;
 
@@ -59,19 +63,55 @@ public class JwtService {
     // Nota de lectura: Define una función o método con los parámetros que necesita esta parte del flujo.
     public String generateToken(User user) {
         // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
+        return issue(user, System.currentTimeMillis() + sessionDuration);
+    // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
+    }
+
+    // Solo se renueva un token todavía válido, perteneciente a la cuenta vigente.
+    // Nota de lectura: Define una función o método con los parámetros que necesita esta parte del flujo.
+    public String renewToken(String token, User user) {
+        // Nota de lectura: Participa en la validación criptográfica del JWT con la clave del servidor.
+        Claims claims = Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token).getBody();
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        Number deadline = claims.get("sessionExpiresAt", Number.class);
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if (!matchesAccount(token, user) || !user.getEmail().equals(claims.getSubject())
+                // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+                || deadline == null || deadline.longValue() <= System.currentTimeMillis()) {
+            // Nota de lectura: Interrumpe la operación y comunica el error al manejador correspondiente.
+            throw new org.springframework.web.server.ResponseStatusException(
+                    // Nota de lectura: Completa los argumentos o la expresión iniciada en la línea anterior.
+                    org.springframework.http.HttpStatus.UNAUTHORIZED, "La sesión debe iniciarse nuevamente");
+        // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
+        }
+        // Conserva el límite original; un cliente no puede ampliarlo mediante la petición.
+        // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
+        return issue(user, deadline.longValue());
+    // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
+    }
+
+    // Nota de lectura: Define una función o método con los parámetros que necesita esta parte del flujo.
+    private String issue(User user, long deadline) {
+        // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
+        long now = System.currentTimeMillis();
+        // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
         return Jwts.builder()
                 // Nota de lectura: Encadena la operación setSubject al resultado anterior.
                 .setSubject(user.getEmail())
+                // Nota de lectura: Encadena la operación setId al resultado anterior.
+                .setId(java.util.UUID.randomUUID().toString())
                 // Nota de lectura: Encadena la operación claim al resultado anterior.
                 .claim("role", user.getRole().name())
                 // Nota de lectura: Encadena la operación claim al resultado anterior.
                 .claim("accountId", user.getId())
                 // Nota de lectura: Encadena la operación claim al resultado anterior.
                 .claim("tokenVersion", user.getTokenVersion())
+                // Nota de lectura: Encadena la operación claim al resultado anterior.
+                .claim("sessionExpiresAt", deadline)
                 // Nota de lectura: Encadena la operación setIssuedAt al resultado anterior.
-                .setIssuedAt(new Date())
+                .setIssuedAt(new Date(now))
                 // Nota de lectura: Encadena la operación setExpiration al resultado anterior.
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(new Date(Math.min(now + jwtExpiration, deadline)))
                 // Nota de lectura: Encadena la operación signWith al resultado anterior.
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 // Nota de lectura: Encadena la operación compact al resultado anterior.

@@ -82,9 +82,11 @@ class AuthServiceApplicationTests {
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(200,call("GET","/auth/session",null,headers).statusCode());
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(200,call("POST","/auth/refresh",null,headers).statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(200,call("GET","/auth/users",null,headers).statusCode());
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
-        String data="{\"name\":\"Persona HTTP\",\"email\":\"http@gmail.com\",\"password\":\"password-test-123\",\"role\":\"CLIENT\"}";
+        String data="{\"name\": \"Persona HTTP\", \"email\": \"http@gmail.com\", \"password\": \"clave123\", \"role\": \"CLIENT\", \"run\": \"123456785\", \"lastName\": \"Prueba\", \"birthDate\": \"1998-05-12\", \"region\": \"Metropolitana de Santiago\", \"commune\": \"Santiago\", \"address\": \"Calle de prueba 123\"}";
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         var created=call("POST","/auth/users",data,headers); assertEquals(201,created.statusCode(),created.body()); long uid=id(created);
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
@@ -93,6 +95,12 @@ class AuthServiceApplicationTests {
         assertEquals(200,call("PUT","/auth/users/"+uid,data.replace("Persona HTTP","Persona Editada"),headers).statusCode());
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(409,call("POST","/auth/users",data,headers).statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(409,call("POST","/auth/users",data.replace("http@gmail.com", "otro@gmail.com"),headers).statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(400,call("POST","/auth/users",data.replace("http@gmail.com", "run@gmail.com").replace("123456785", "123456784"),headers).statusCode());
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals(400,call("POST","/auth/users",data.replace("http@gmail.com", "comuna@gmail.com").replace("\"commune\": \"Santiago\"", "\"commune\": \"Valparaíso\""),headers).statusCode());
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertEquals(400,call("POST","/auth/users","{}",headers).statusCode());
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.

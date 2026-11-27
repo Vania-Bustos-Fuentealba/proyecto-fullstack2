@@ -1,3 +1,5 @@
+> Revisión vigente 27/11/2026: integración, ERS, Vendedor y renovación JWT; instrucciones y límites en [ENTREGA.md](ENTREGA.md). Pruebas y documentos en [docs/entrega](docs/entrega).
+
 # Online Library - backend integrado
 
 Entrega DSY1104: administración de Vania, tienda/pedidos de Vale y contenido de Ale.

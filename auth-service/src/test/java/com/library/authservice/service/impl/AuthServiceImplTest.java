@@ -102,7 +102,7 @@ class UserServiceImplTest {
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         dto.setPassword("123456");
         // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
-        return dto;
+        return com.library.authservice.ProfileTestData.complete(dto);
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
     }
 
@@ -265,7 +265,9 @@ class UserServiceImplTest {
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
         assertFalse(payload.containsKey("phone"));
         // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
-        assertFalse(payload.containsKey("address"));
+        assertEquals("Calle de prueba 123", payload.get("address"));
+        // Nota de lectura: Comprueba el resultado esperado; una diferencia hace fallar esta prueba.
+        assertEquals("123456785", payload.get("run"));
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
     }
 

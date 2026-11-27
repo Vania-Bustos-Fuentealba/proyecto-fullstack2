@@ -26,5 +26,15 @@ public class UserResponseDTO {
     private String phone;
     // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
     private String address;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String run;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String lastName;
+    // Nota de lectura: Completa los argumentos o la expresión iniciada en la línea anterior.
+    private java.time.LocalDate birthDate;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String region;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String commune;
 // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
 }

@@ -43,10 +43,17 @@ public class AdminAccountService {
     // Nota de lectura: Declara una dependencia que se recibe al construir esta clase.
     private final RestTemplate restTemplate;
 
+    // Nota de lectura: Anotación que configura el comportamiento o la validación declarada en esta línea.
+    @org.springframework.beans.factory.annotation.Value("${user-service.url:http://user-service:8080}")
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String userServiceUrl = "http://user-service:8080";
+
     // Nota de lectura: Define una función o método con los parámetros que necesita esta parte del flujo.
     private AdminAccountResponse response(User account) {
         // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
-        return new AdminAccountResponse(account.getId(), account.getName(), account.getEmail(), account.getRole());
+        return new AdminAccountResponse(account.getId(), account.getName(), account.getEmail(), account.getRole(),
+                // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+                account.getRun(), account.getLastName(), account.getBirthDate(), account.getRegion(), account.getCommune(), account.getAddress());
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
     }
     // Nota de lectura: Define una función o método con los parámetros que necesita esta parte del flujo.
@@ -79,6 +86,8 @@ public class AdminAccountService {
         RegisterRequestDTO data = new RegisterRequestDTO(request.getName().trim(),
                 // Nota de lectura: Normaliza texto para comparar y guardar datos sin espacios externos o diferencias de mayúsculas.
                 request.getEmail().trim().toLowerCase(Locale.ROOT), request.getPassword());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        com.library.authservice.security.ProfileRules.copy(request, data);
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
         UserResponseDTO created = registration.registerUser(data);
         // Nota de lectura: Asigna o compara el valor de esta parte de la expresión.
@@ -118,12 +127,20 @@ public class AdminAccountService {
             // Nota de lectura: Interrumpe la operación y comunica el error al manejador correspondiente.
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo ya está registrado");
 
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        com.library.authservice.security.ProfileRules.validate(request);
+        // Nota de lectura: Consulta o modifica la base de datos a través del repositorio JPA.
+        if (repository.existsByRunAndIdNot(request.getRun().toUpperCase(java.util.Locale.ROOT), id))
+            // Nota de lectura: Interrumpe la operación y comunica el error al manejador correspondiente.
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El RUN ya está registrado");
         // Sincroniza por correo; los IDs de las dos bases son independientes.
         // Si el perfil falla, la transacción local no confirma la edición de Auth.
         // Nota de lectura: Comunicación HTTP interna con otro servicio; no es una operación de LocalStorage.
-        restTemplate.put("http://user-service:8080/users/email/{email}",
+        restTemplate.put(userServiceUrl + "/users/email/{email}",
                 // Nota de lectura: Normaliza texto para comparar y guardar datos sin espacios externos o diferencias de mayúsculas.
-                Map.of("name", request.getName().trim(), "email", email), user.getEmail());
+                com.library.authservice.security.ProfileRules.payload(request, request.getName().trim(), email), user.getEmail());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        com.library.authservice.security.ProfileRules.apply(request, user);
         // Nota de lectura: Normaliza texto para comparar y guardar datos sin espacios externos o diferencias de mayúsculas.
         user.setName(request.getName().trim());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
@@ -155,7 +172,7 @@ public class AdminAccountService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "No puedes eliminar tu cuenta ni la administradora principal");
         // El perfil se elimina primero. Un fallo remoto no se presenta como éxito.
         // Nota de lectura: Consulta o modifica los registros mediante el repositorio de persistencia.
-        restTemplate.delete("http://user-service:8080/users/email/{email}", user.getEmail());
+        restTemplate.delete(userServiceUrl + "/users/email/{email}", user.getEmail());
         // Nota de lectura: Consulta o modifica los registros mediante el repositorio de persistencia.
         repository.delete(user);
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.

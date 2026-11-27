@@ -26,5 +26,15 @@ public class BookResponseDTO {
     private Double price;
     // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
     private Integer stock;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String code;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String description;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String category;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private String imageUrl;
+    // Nota de lectura: Declara el campo y su tipo para guardar este dato en el objeto.
+    private Integer criticalStock;
 // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
 }

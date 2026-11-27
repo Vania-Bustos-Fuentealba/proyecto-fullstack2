@@ -78,7 +78,7 @@ public class PedidoController {
     // Nota de lectura: Asocia el método HTTP y la ruta escritos con la operación del controlador.
     @GetMapping
     // Nota de lectura: Documenta la operación para Swagger/OpenAPI.
-    @Operation(summary = "Lista todos los pedidos, del más reciente al más antiguo")
+    @Operation(summary = "Lista los pedidos para ADMIN o SELLER, del más reciente al más antiguo")
     // Nota de lectura: Define una función o método con los parámetros que necesita esta parte del flujo.
     public List<PedidoResponse> listar() {
         // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.

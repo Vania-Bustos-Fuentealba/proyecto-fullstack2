@@ -1,0 +1,114 @@
+Guía de presentación individual - Online Library
+Preparación para la Evaluación Parcial 3 - 27/11/2026
+
+Esta guía es material de estudio, no un texto que debas leer completo. La pauta distribuye esta evaluación en 40% encargo grupal y 60% presentación individual. Cada integrante debe explicar seis indicadores. El recorrido propuesto de 8 a 10 minutos es una recomendación de ensayo, no una duración fijada por el docente.
+
+Tu foco: administración, roles y pruebas. Atribuye correctamente el blog/contacto y registro inicial a Ale, y el trabajo de tienda/pedidos de Vale como base de la integración. Explica qué se adaptó para que todas las partes usaran las mismas API y existencias. No presentes trabajo de otra integrante como si lo hubieras escrito sola.
+
+Antes de presentar
+- Iniciar Docker Desktop, configurar .env privado e iniciar docker-compose.entrega.yml.
+- Esperar el arranque de Spring y verificar el acceso al catálogo y Swagger.
+- Iniciar front-react con npm ci y npm run dev. En esta revisión: React 5177 y Gateway 18080; los valores habituales son 5173 y 8080.
+- Preparar cuentas de prueba ADMIN, CLIENT y SELLER; no mostrar contraseñas, JWT ni .env en pantalla.
+- Tener abiertos los ZIP actuales, el manual, el documento de integración y los dos PR. Los enlaces deben apuntar a feature/react-tienda mientras no se fusionen.
+- Conservar un libro y un pedido ficticios para la demo. Usar datos de prueba; no RUN o direcciones de personas reales.
+
+===
+1. Modelo, base de datos y reglas de negocio
+
+Idea que debes explicar: React muestra la información; Spring aplica las reglas y MySQL conserva los datos. Recargar el navegador no borra cuentas, libros ni pedidos.
+
+Mapa de responsabilidades
+- Auth: cuenta, correo, RUN, perfil, hash BCrypt, rol y versión de credenciales.
+- User: perfil sincronizado; su ID es independiente del ID de Auth.
+- Book: libros y stock; también pedidos e ítems para guardar el pedido y descontar unidades en una misma transacción.
+- Content: publicaciones y consultas del formulario de contacto.
+- Gateway: entrada única, rutas, CORS y permisos. MySQL tiene las bases de los servicios.
+
+Ejemplo para mostrar: editar el stock crítico de un libro a 8 y dejar existencias en 7; el resumen y listado indican stock bajo. Recargar y mostrar que se conserva. Si no hay umbral configurado, no se inventa uno.
+
+Reglas que debes poder justificar: RUN con módulo 11 y sin duplicados; comuna perteneciente a región; precio cero o positivo; existencias enteras; código único; total y descuento calculados en el servidor. Dos compras por la última unidad no deben venderla dos veces: una confirma y la otra recibe conflicto.
+
+Flyway: V1/V2 forman el esquema anterior y V3 agrega los campos ERS. No se inventan datos para cuentas antiguas. La cuenta inicial es técnica; su identidad personal se completa cuando la responsable la ingresa.
+
+Pregunta probable: ¿por qué no se usa Inventory? Respuesta: la entrega toma Book como única fuente de stock y coloca allí el pedido transaccional. Los servicios históricos se conservan, pero no se afirma que estén sincronizados ni probados en esta entrega.
+
+===
+2. API REST, Spring Boot y Swagger
+
+Explica el recorrido controlador -> servicio -> repositorio -> MySQL. El controlador recibe y valida el DTO; el servicio resuelve reglas; JPA persiste; el DTO de respuesta evita devolver el hash de contraseña.
+
+Demo sugerida: abrir /swagger-ui/index.html en el Gateway. Elegir Autenticacion y cuentas y luego Libros y pedidos. Mostrar rutas y esquemas, sin pegar un token real en una grabación o documento compartido.
+
+Contratos que debes recordar
+- POST /auth/login y /auth/register: públicos; registro siempre CLIENT.
+- GET/POST /auth/users y GET/PUT/DELETE /auth/users/{id}: ADMIN.
+- GET /books y /books/{id}: públicos. Escritura: ADMIN.
+- POST /pedidos: ADMIN o CLIENT, con Idempotency-Key.
+- GET /pedidos: ADMIN o SELLER. GET /pedidos/{id}: esos roles o el dueño por ID.
+- POST /auth/refresh: token aún válido; conserva el máximo absoluto de sesión.
+
+Estados: 200 lectura/edición, 201 creación, 204 eliminación sin cuerpo; 400 datos inválidos, 401 falta o invalidez de sesión, 403 permiso insuficiente, 404 recurso inexistente y 409 conflicto de reglas. Una clave repetida con el mismo pedido devuelve el pedido existente; con datos diferentes produce 409.
+
+Pregunta probable: ¿por qué no se elimina un libro vendido? Respuesta: su historial de pedidos debe conservarse. La API rechaza la eliminación con 409 y el frontend explica el conflicto.
+
+===
+3. Integración frontend/backend
+
+Flujo: formulario React -> servicios de frontend -> cliente fetch común -> /api de Vite -> Gateway -> microservicio -> MySQL -> respuesta -> actualización de la interfaz.
+
+fetch cumple la pauta igual que Axios. api.js evita repetir URL base, Authorization, tiempos de espera y tratamiento de errores. Un HTTP 400/401/403 no hace fallar fetch por sí solo: se comprueba response.ok. El timeout evita que un formulario quede bloqueado indefinidamente.
+
+Demo: crear o editar un libro desde administración, ver confirmación y comprobarlo en la tienda. Cambiar una cantidad y crear un pedido ficticio. El servidor vuelve a comprobar precio y stock; el carrito se limpia solo tras una respuesta válida. El navegador no decide el precio cobrado.
+
+Carrito y cupón se conservan localmente; los libros y cuentas ya no se simulan con localStorage. Una lista vacía y una falla del servidor son estados distintos. La interfaz muestra carga, error, reintento y éxito según la respuesta real.
+
+Pregunta probable: ¿por qué CORS? Respuesta: controla qué orígenes web pueden realizar la comunicación admitida por el Gateway. No reemplaza autenticación ni permisos. Solo se publica el puerto del Gateway; Book/User/Content quedan en red Docker privada.
+
+Límite que debes reconocer: Auth y User usan transacciones locales. La sincronización reintentable no es una transacción distribuida; una evolución productiva debería tratar explícitamente las compensaciones y recuperación entre servicios.
+
+===
+4. Autenticación, JWT y roles
+
+La contraseña se compara con BCrypt; no se guarda en texto plano. Al autenticar, Auth firma un JWT con identidad, rol, vencimiento, versión de credenciales y límite absoluto. Decodificar un JWT en React no valida su firma: la verificación de seguridad ocurre en el servidor.
+
+Gateway verifica el JWT y consulta la cuenta vigente en Auth. Reemplaza las cabeceras de identidad enviadas por el cliente. Una cuenta eliminada, un token vencido o una versión antigua de contraseña son rechazados. El pedido pertenece a un ID estable, no al correo mutable.
+
+Permisos: ADMIN administra; SELLER consulta productos y órdenes; CLIENT usa la tienda y sus pedidos. No basta ocultar botones: las peticiones directas también reciben 403 cuando el rol no tiene permiso.
+
+Renovación: acceso de 15 minutos; se renueva antes de vencer conservando el límite original de 24 horas. Un JWT vencido no sirve para renovarlo. Cambiar la contraseña invalida tokens anteriores; la renovación normal no revoca por sí sola el acceso anterior hasta su expiración.
+
+Pregunta probable: ¿una persona puede cambiar el rol guardado en el navegador? Respuesta: puede manipular su navegador, pero el servidor verifica firma y rol vigente; no obtiene acceso administrativo por cambiar un texto local.
+
+Excepción documentada: las nuevas contraseñas siguen los 4-10 caracteres de la ERS. La cuenta bootstrap mantiene mínimo 12 y el login conserva compatibilidad con claves anteriores. Es una excepción al máximo histórico, no una afirmación de cumplimiento literal; no recomendamos restringir a 10 caracteres en producción.
+
+===
+5 y 6. Sesión persistente y restricciones visuales
+
+La sesión se reconstruye desde el JWT persistido, se comprueba su expiración y se valida la identidad con Auth. Recargar mantiene una sesión vigente. Un 401 cierra la sesión correspondiente; una respuesta antigua no cierra otra sesión que se inició después.
+
+SessionRenewal revisa periódicamente la pestaña visible y al recuperar foco. El cliente de API también renueva antes de una petición cuando falta poco para vencer. Si la pestaña estuvo inactiva hasta que venció el acceso, se pide iniciar sesión de nuevo.
+
+Demo ordenada
+1. Entrar como ADMIN, mostrar resumen, usuarios, libros y órdenes. Editar un libro y recargar.
+2. Cerrar sesión e intentar /admin: debe ir a login.
+3. Entrar como SELLER: solo aparecen Productos y Órdenes; abrir detalle de una orden.
+4. Escribir /admin/usuarios: debe volver a /vendedor/productos. Explicar que la prueba HTTP de esa acción recibe 403.
+5. Entrar como CLIENT: puede comprar, no administrar usuarios. Mostrar validación de un formulario sin enviarlo con datos personales reales.
+
+localStorage permite la persistencia pero es accesible a JavaScript. Reconocer el riesgo de XSS; no decir que equivale a una cookie HttpOnly. Cerrar sesión borra el token local, no todos los tokens copiados. HTTPS y una estrategia de cookies/CSP/revocación deben revisarse antes de una publicación de producción.
+
+===
+Pruebas, entrega y preguntas finales
+
+Resultados: 109 pruebas frontend, 107 backend, build y lint aprobados; JaCoCo 80% por clase en Auth/Book/User aprobado. 43 respuestas de integración administrativa y 78 de integración de equipo, con MySQL y Gateway reales. La cobertura frontend de líneas es 95,55% del conjunto configurado; no de todos los archivos del proyecto.
+
+Puedes explicar tres pruebas representativas: una cuenta CLIENT no puede modificar stock; dos compras compiten por la última unidad; una respuesta de renovación tardía no reabre una sesión cerrada. Eso demuestra reglas y casos de error, además del camino correcto.
+
+Un primer intento de integración conjunta recibió 502; el recorrido completo repetido terminó correctamente. Si sucede en la demo, revisar si todos los servicios terminaron de arrancar y consultar logs. No afirmar una causa no comprobada ni esconder el error como éxito.
+
+Qué se entrega: los enlaces públicos de ambos repositorios y sus ramas de revisión, ZIP frontend/backend, manual con capturas y documento de integración. Esta guía apoya la exposición individual. La carga en el aula virtual y el ensayo de cada integrante siguen siendo tareas del equipo.
+
+Qué no afirmar: no hay cobro bancario real, correo de confirmación o despacho; PENDIENTE_PAGO solo registra un pedido. No se verificó un despliegue público ni todos los microservicios históricos. Tener pruebas aprobadas no garantiza la nota máxima.
+
+Ensayo final: sin leer, explica dónde se valida un RUN, qué pasa al vencer el JWT, por qué SELLER no puede editar stock, quién calcula el total, qué hace Idempotency-Key y qué documentos corresponden a los commits entregados. Si puedes señalar el archivo y la prueba de cada regla, estás preparada para defenderla.

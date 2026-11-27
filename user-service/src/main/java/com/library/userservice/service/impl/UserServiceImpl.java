@@ -55,6 +55,17 @@ public class UserServiceImpl implements UserService {
         response.setPhone(user.getPhone());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         response.setAddress(user.getAddress());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setRun(user.getRun());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setLastName(user.getLastName());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setBirthDate(user.getBirthDate());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setRegion(user.getRegion());
+        // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
+        response.setCommune(user.getCommune());
+
         // Nota de lectura: Entrega el resultado de la función o la interfaz que debe renderizar React.
         return response;
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.
@@ -209,6 +220,19 @@ public class UserServiceImpl implements UserService {
         profile.setName(request.name());
         // Nota de lectura: Invoca la operación indicada con los argumentos de este bloque.
         profile.setEmail(request.email());
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if (request.run() != null) profile.setRun(request.run());
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if (request.lastName() != null) profile.setLastName(request.lastName());
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if (request.run() != null) profile.setBirthDate(request.birthDate());
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if (request.region() != null) profile.setRegion(request.region());
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if (request.commune() != null) profile.setCommune(request.commune());
+        // Nota de lectura: Evalúa una condición. El bloque solo continúa por esta rama si se cumple.
+        if (request.address() != null) profile.setAddress(request.address());
+
         // Nota de lectura: Consulta o modifica los registros mediante el repositorio de persistencia.
         return mapToResponse(userRepository.save(profile));
     // Nota de lectura: Cierra o delimita la expresión, bloque o elemento abierto en las líneas anteriores.

@@ -27,7 +27,9 @@ eureka:
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 86400000
+  # Acceso de 15 minutos; se puede renovar sin superar 24 horas de sesión.
+  expiration: ${JWT_EXPIRATION:900000}
+  session-duration: ${JWT_SESSION_DURATION:86400000}
 
 springdoc:
   api-docs:

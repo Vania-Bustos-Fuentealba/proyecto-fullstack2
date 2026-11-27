@@ -51,7 +51,7 @@ spring:
             - id: auth-protected
               uri: http://auth-service:8080
               predicates:
-                - Path=/auth/users/**,/auth/session
+                - Path=/auth/users/**,/auth/session,/auth/refresh
               filters:
                 - jwtFilter
 
