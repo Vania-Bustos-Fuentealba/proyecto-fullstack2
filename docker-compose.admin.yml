@@ -1,0 +1,49 @@
+# Entorno de comprobación de administración. No sustituye el despliegue grupal.
+# Ejecutar con -p online-library-admin para mantener su BD separada.
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - admin-test-db:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: [CMD, mysqladmin, ping, -h, localhost]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  auth-service:
+    build: ./auth-service
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD}
+      EUREKA_CLIENT_ENABLED: 'false'
+    depends_on:
+      mysql: {condition: service_healthy}
+  user-service:
+    build: ./user-service
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      EUREKA_CLIENT_ENABLED: 'false'
+    depends_on:
+      mysql: {condition: service_healthy}
+  book-service:
+    build: ./book-service
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      EUREKA_CLIENT_ENABLED: 'false'
+    depends_on:
+      mysql: {condition: service_healthy}
+  api-gateway:
+    build: ./api-gateway
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      EUREKA_CLIENT_ENABLED: 'false'
+    ports:
+      - '127.0.0.1:${ADMIN_GATEWAY_PORT:-18080}:8080'
+    depends_on: [auth-service, user-service, book-service]
+volumes:
+  admin-test-db:

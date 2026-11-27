@@ -1,4 +1,5 @@
-CREATE TABLE users (
+-- Instalación limpia: el nombre debe coincidir con @Table(name = "auth_users").
+CREATE TABLE auth_users (
                        id BIGINT NOT NULL AUTO_INCREMENT,
                        name VARCHAR(100) NOT NULL,
                        email VARCHAR(150) NOT NULL,

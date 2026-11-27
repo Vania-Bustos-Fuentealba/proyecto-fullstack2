@@ -41,7 +41,9 @@ services:
     build: ./api-gateway
     container_name: api-gateway
     environment:
-      JAVA_TOOL_OPTIONS: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/ -Dapp.jwt.secret=${JWT_SECRET} -Dapp.jwt.expiration=${JWT_EXPIRATION}"
+      # Las opciones de Java se imprimen al arrancar: la clave va en una variable aparte.
+      JAVA_TOOL_OPTIONS: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/"
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
     depends_on:
@@ -58,12 +60,14 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       JAVA_TOOL_OPTIONS: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/"
-    ports:
-      - "8081:8080"
+    # Servicio interno: las peticiones del navegador deben pasar por el Gateway.
+    expose:
+      - "8080"
     depends_on:
       mysql:
         condition: service_healthy
@@ -80,10 +84,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/book_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       JAVA_TOOL_OPTIONS: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/"
-    ports:
-      - "8082:8080"
+    # Servicio interno: las peticiones del navegador deben pasar por el Gateway.
+    expose:
+      - "8080"
     depends_on:
       mysql:
         condition: service_healthy
@@ -142,8 +147,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       JAVA_TOOL_OPTIONS: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/"
-    ports:
-      - "8086:8080"
+    # Servicio interno: las peticiones del navegador deben pasar por el Gateway.
+    expose:
+      - "8080"
     depends_on:
       mysql:
         condition: service_healthy
@@ -200,10 +206,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/user_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       JAVA_TOOL_OPTIONS: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/"
-    ports:
-      - "8089:8080"
+    # Servicio interno: las peticiones del navegador deben pasar por el Gateway.
+    expose:
+      - "8080"
     depends_on:
       mysql:
         condition: service_healthy
@@ -261,8 +268,6 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       SERVER_PORT: 8080
       JAVA_TOOL_OPTIONS: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/"
-    ports:
-      - "8084:8080"
     depends_on:
       mysql:
         condition: service_healthy

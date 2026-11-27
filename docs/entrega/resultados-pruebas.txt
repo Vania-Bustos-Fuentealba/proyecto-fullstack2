@@ -1,0 +1,25 @@
+RESULTADOS VERIFICADOS - ONLINE LIBRARY - 26/11/2026
+
+Frontend: 99 pruebas aprobadas en 18 archivos, compilación Vite aprobada y lint aprobado.
+Cobertura de los fuentes configurados: 95,34% líneas; 93,09% instrucciones; 84,74% ramas; 97,03% funciones. No es cobertura global de toda la aplicación.
+
+Backend (mvn verify; sin pruebas omitidas):
+- auth-service: 31 pruebas, 0 fallos, 0 errores.
+- book-service: 12 pruebas, 0 fallos, 0 errores.
+- user-service: 12 pruebas, 0 fallos, 0 errores.
+- content-service: 16 pruebas, 0 fallos, 0 errores.
+- api-gateway: 30 pruebas, 0 fallos, 0 errores.
+
+Auth, Book y User aprueban JaCoCo de 80% mínimo por clase. Content y Gateway no tienen ese mismo control de cobertura configurado.
+
+Integración real en Docker/MySQL por el Gateway:
+- Administración: 43 respuestas verificadas, más limpieza de datos de la prueba.
+- Equipo: 49 respuestas verificadas; contenido, checkout, stock, idempotencia, concurrencia y permisos.
+- CORS con origen de navegador: contacto 201.
+- Swagger central: esquemas Auth/User/Book/Content accesibles por el Gateway.
+
+Seguridad de identidad: cambiar correo mantiene pedidos por ID; otra cuenta que reutiliza el correo no accede a ellos; tokens anteriores no se transfieren a la nueva cuenta; cambiar contraseña invalida sesiones anteriores.
+
+Recorrido visual: blog, detalle, contacto guardado, login ADMIN, resumen/usuarios/productos, alta de libro, búsqueda pública, carrito/cupón persistentes, checkout confirmado sin cobro, cierre de sesión y redirección de /admin a login. Capturas incluidas en el manual.
+
+Los microservicios históricos fuera de docker-compose.entrega.yml no forman parte de estas verificaciones. No hay cobro bancario real ni despliegue público comprobado.

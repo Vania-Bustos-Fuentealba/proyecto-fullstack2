@@ -7,6 +7,42 @@ spring:
       server:
         webmvc:
           routes:
+            # Solo el esquema OpenAPI: las operaciones conservan su filtro JWT.
+            - id: openapi-auth
+              uri: http://auth-service:8080
+              predicates:
+                - Path=/openapi/auth
+                - Method=GET
+              filters:
+                - SetPath=/v3/api-docs
+
+            # Solo el esquema OpenAPI: las operaciones conservan su filtro JWT.
+            - id: openapi-users
+              uri: http://user-service:8080
+              predicates:
+                - Path=/openapi/users
+                - Method=GET
+              filters:
+                - SetPath=/v3/api-docs
+
+            # Solo el esquema OpenAPI: las operaciones conservan su filtro JWT.
+            - id: openapi-books
+              uri: http://book-service:8080
+              predicates:
+                - Path=/openapi/books
+                - Method=GET
+              filters:
+                - SetPath=/v3/api-docs
+
+            # Solo el esquema OpenAPI: las operaciones conservan su filtro JWT.
+            - id: openapi-content
+              uri: http://content-service:8080
+              predicates:
+                - Path=/openapi/content
+                - Method=GET
+              filters:
+                - SetPath=/v3/api-docs
+
             - id: auth-public
               uri: http://auth-service:8080
               predicates:
@@ -15,7 +51,7 @@ spring:
             - id: auth-protected
               uri: http://auth-service:8080
               predicates:
-                - Path=/auth/users/**
+                - Path=/auth/users/**,/auth/session
               filters:
                 - jwtFilter
 
@@ -23,6 +59,14 @@ spring:
               uri: http://book-service:8080
               predicates:
                 - Path=/books/**
+              filters:
+                - jwtFilter
+
+            # Pedidos de Vale usan los mismos libros y la misma transacción de stock.
+            - id: pedidos-tienda
+              uri: http://book-service:8080
+              predicates:
+                - Path=/pedidos/**
               filters:
                 - jwtFilter
 
@@ -94,4 +138,18 @@ server:
 
 app:
   jwt:
-    secret: bXlzZWNyZXRrZXlteXNlY3JldGtleW15c2VjcmV0a2V5MTIzNDU2
+    secret: ${JWT_SECRET}
+
+# Swagger central permite demostrar las API sin publicar puertos internos.
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    urls:
+      - name: Autenticacion y cuentas
+        url: /openapi/auth
+      - name: Perfiles de usuarios
+        url: /openapi/users
+      - name: Libros y pedidos
+        url: /openapi/books
+      - name: Blog y contacto
+        url: /openapi/content
