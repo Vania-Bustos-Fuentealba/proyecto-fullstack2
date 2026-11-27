@@ -1,0 +1,2 @@
+# Preserva los bytes de los documentos y evita conversiones de finales de línea.
+*.pdf binary

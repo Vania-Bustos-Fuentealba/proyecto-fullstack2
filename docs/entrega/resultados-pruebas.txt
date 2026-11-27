@@ -1,0 +1,43 @@
+RESULTADOS VERIFICADOS - ONLINE LIBRARY - 27/11/2026
+
+Frontend: 109 pruebas aprobadas en 21 archivos; Vite build y oxlint aprobados.
+Cobertura del conjunto configurado: 95,55% líneas, 93,07% instrucciones,
+83,59% ramas y 96,64% funciones. No es cobertura global de toda la aplicación.
+
+Backend: mvn verify, sin pruebas omitidas.
+- auth-service: 36 pruebas; 0 fallos y 0 errores.
+- book-service: 12 pruebas; 0 fallos y 0 errores.
+- user-service: 12 pruebas; 0 fallos y 0 errores.
+- content-service: 16 pruebas; 0 fallos y 0 errores.
+- api-gateway: 31 pruebas; 0 fallos y 0 errores.
+Total backend: 107 pruebas. Auth, Book y User aprueban JaCoCo con 80%
+de líneas mínimo por clase, sin rebajar el umbral. Content/Gateway no tienen
+el mismo control JaCoCo configurado. Content no cambió desde su verify del 26/11;
+los otros cuatro módulos se verificaron el 27/11. Las notas Java se comprobaron
+retirándolas y comparando el código original; en JS/JSX/CSS la salida compilada
+antes y después de comentar fue idéntica.
+
+Integración por Gateway con Docker/MySQL:
+- Administración: 43 respuestas comprobadas, más limpieza de cuentas de prueba.
+- Equipo: 78 respuestas comprobadas. CRUD, perfil completo, datos de libros,
+  stock, cupón, concurrencia, idempotencia, contenido, roles y renovación JWT.
+- El primer intento de equipo recibió 502 al registrar; se repitió el recorrido
+  completo con los servicios disponibles y terminó sin fallos.
+- CORS y Swagger central comprobados en la revisión integrada.
+- RUN duplicado/inválido, comuna de otra región, fecha futura, rol inválido,
+  stock fraccionario, categoría inválida y URL de imagen insegura rechazados.
+- Precio cero aceptado. Stock crítico cero y campos persistidos comprobados.
+- SELLER consulta órdenes y productos; obtiene 403 al administrar cuentas,
+  escribir libros, crear pedidos o consultar mensajes de contacto.
+- Cambio de contraseña invalida tokens anteriores. Reutilizar un correo no
+  transfiere los pedidos a otra identidad. Renovar conserva el límite absoluto.
+
+Navegador real: edición persistida de un libro, umbral de stock, perfil de usuario,
+registro con región/comuna dependientes, login SELLER, listado y detalle de órdenes,
+redirección del vendedor desde /admin/usuarios y cierre de sesión. Se conservan
+capturas anteriores de blog/contacto y checkout confirmado sin cobro, cuyos flujos
+no cambiaron. El manual diferencia los límites y usa datos ficticios.
+
+Entorno aislado: library-entrega-check, React 127.0.0.1:5177, Gateway 18080.
+Los módulos históricos fuera del compose de entrega, un despliegue público y
+una pasarela bancaria real no forman parte de estas verificaciones.
