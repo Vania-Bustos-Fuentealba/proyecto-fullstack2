@@ -10,7 +10,7 @@ Antes de presentar
 - Esperar el arranque de Spring y verificar el acceso al catálogo y Swagger.
 - Iniciar front-react con npm ci y npm run dev. En esta revisión: React 5177 y Gateway 18080; los valores habituales son 5173 y 8080.
 - Preparar cuentas de prueba ADMIN, CLIENT y SELLER; no mostrar contraseñas, JWT ni .env en pantalla.
-- Tener abiertos los ZIP actuales, el manual, el documento de integración y los dos PR. Los enlaces deben apuntar a feature/react-tienda mientras no se fusionen.
+- Tener abiertos los ZIP actuales, el manual, el documento de integración y los dos PR. Los enlaces de entrega apuntan a main; los PR conservan el historial de revisión de feature/react-tienda.
 - Conservar un libro y un pedido ficticios para la demo. Usar datos de prueba; no RUN o direcciones de personas reales.
 
 ===
@@ -107,7 +107,7 @@ Puedes explicar tres pruebas representativas: una cuenta CLIENT no puede modific
 
 Un primer intento de integración conjunta recibió 502; el recorrido completo repetido terminó correctamente. Si sucede en la demo, revisar si todos los servicios terminaron de arrancar y consultar logs. No afirmar una causa no comprobada ni esconder el error como éxito.
 
-Qué se entrega: los enlaces públicos de ambos repositorios y sus ramas de revisión, ZIP frontend/backend, manual con capturas y documento de integración. Esta guía apoya la exposición individual. La carga en el aula virtual y el ensayo de cada integrante siguen siendo tareas del equipo.
+Qué se entrega: los enlaces públicos de main de ambos repositorios, ZIP frontend/backend, manual con capturas y documento de integración. Esta guía apoya la exposición individual. La carga en el aula virtual y el ensayo de cada integrante siguen siendo tareas del equipo.
 
 Qué no afirmar: no hay cobro bancario real, correo de confirmación o despacho; PENDIENTE_PAGO solo registra un pedido. No se verificó un despliegue público ni todos los microservicios históricos. Tener pruebas aprobadas no garantiza la nota máxima.
 

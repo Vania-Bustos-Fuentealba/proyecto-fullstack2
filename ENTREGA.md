@@ -1,6 +1,6 @@
 # Online Library - integración de la entrega III
 
-Revisión del 27 de noviembre de 2026. Frontend vigente: `front-react`. Backend de entrega: `Vania-Bustos-Fuentealba/proyecto-fullstack2`, rama `feature/react-tienda`.
+Revisión del 27 de noviembre de 2026. Frontend vigente: `front-react`. Backend de entrega: `Vania-Bustos-Fuentealba/proyecto-fullstack2`, rama de entrega `main`; desarrollo en `feature/react-tienda`.
 
 ## Procedencia y alcance
 
@@ -130,4 +130,4 @@ JSON y archivos lock no admiten comentarios; no se alteran. Tampoco se reescribe
 | 5. Sesión persistente | usuarios.js, SessionRenewal.jsx | Recarga, expiración y respuesta tardía |
 | 6. Acceso frontend | AdminLayout, rutas /admin y /vendedor | Vendedor sin edición ni acceso a usuarios |
 
-Resultados detallados: docs/entrega/resultados-pruebas.txt. Material para estudiar: docs/entrega/guia-presentacion-online-library.pdf. Las ramas de revisión son feature/react-tienda; frontend PR #11 y backend PR #4. Los ZIP corresponden a los commits indicados en estado-entrega.json externo al repositorio. No se fusionan estos PR automáticamente.
+Resultados detallados: docs/entrega/resultados-pruebas.txt. Material para estudiar: docs/entrega/guia-presentacion-online-library.pdf. La rama de entrega es main en ambos repositorios. El trabajo se desarrolló en feature/react-tienda y se revisa mediante frontend PR #11 y backend PR #4. Los ZIP corresponden a los commits indicados en estado-entrega.json externo al repositorio. La fusión de estos PR a main fue autorizada expresamente por la responsable del proyecto.
